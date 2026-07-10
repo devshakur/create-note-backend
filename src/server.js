@@ -14,9 +14,9 @@ app.use(cookieParser())
 app.use("/auth", authRoutes)
 app.use("/notes", notesRoutes)
 
-const PORT = 8080;
 
-const server = app.listen(PORT, ()=> {
+
+const server = app.listen(process.env.PORT || 8080, ()=> {
     console.log(`Server running on Port ${PORT}`);
     
 })
