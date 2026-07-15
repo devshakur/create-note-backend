@@ -19,7 +19,7 @@ const parseExpiryToMs = (expiry) => {
 const cookieOptions = (maxAge) => ({
   httpOnly: true,
   secure: process.env.NODE_ENV?.trim() === "production",
-  sameSite: "strict",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   path: "/",
   maxAge,
 });
