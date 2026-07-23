@@ -1,30 +1,14 @@
 import { prisma } from "../config/db.js";
 import { asyncHandler, AppError } from "../middlewares/errorHandler.js";
+import { getPaginatedNotes } from "../services/noteFilterService.js";
 
 const getAllNotes = asyncHandler(async (req, res) => {
-  const page = Math.max(1, Number(req.query.page) || 1);
-  const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 20));
-  const skip = (page - 1) * limit;
-
-  const [notes, total] = await Promise.all([
-    prisma.note.findMany({
-      where: { userId: req.user.id },
-      orderBy: { createdAt: "desc" },
-      skip,
-      take: limit,
-    }),
-    prisma.note.count({ where: { userId: req.user.id } }),
-  ]);
+  const { notes, pagination } = await getPaginatedNotes(req.user.id, req.query);
 
   res.status(200).json({
     status: "success",
     results: notes.length,
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit) || 1,
-    },
+    pagination,
     data: notes,
   });
 });
