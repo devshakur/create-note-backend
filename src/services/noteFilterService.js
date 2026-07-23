@@ -48,21 +48,23 @@ export const buildNoteFilter = (userId, query) => {
   const { search, period } = query;
   validatePeriod(period);
 
-  const filter = { userId };
+  const andConditions = [{ userId }];
 
   if (search?.trim()) {
     const term = search.trim();
-    filter.OR = [
-      { title: { contains: term, mode: "insensitive" } },
-      { content: { contains: term, mode: "insensitive" } },
-    ];
+    andConditions.push({
+      OR: [
+        { title: { contains: term, mode: "insensitive" } },
+        { content: { contains: term, mode: "insensitive" } },
+      ],
+    });
   }
 
   if (period) {
-    filter.createdAt = PERIOD_RANGES[period]();
+    andConditions.push({ createdAt: PERIOD_RANGES[period]() });
   }
 
-  return filter;
+  return { AND: andConditions };
 };
 
 export const getPaginatedNotes = async (userId, query) => {
